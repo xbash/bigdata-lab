@@ -1,0 +1,143 @@
+services:
+  master:
+    container_name: bigdata-master
+    hostname: master
+    build:
+      context: .
+      dockerfile: containers/master/Containerfile
+      args:
+        BASE_IMAGE: "bigdata-core-base:${BIGDATA_IMAGE_TAG}"
+    image: bigdata-master-core:${BIGDATA_IMAGE_TAG}
+    environment:
+      SERVICE_ROLE: master
+      CLUSTER_NAME: bigdata-lab
+      HDFS_REPLICATION: "2"
+      TZ: America/Santiago
+    volumes:
+      - ./conf:/opt/bigdata/conf:ro,z
+      - namenode-data:/opt/bigdata/data/namenode
+      - ./data/shared:/opt/bigdata/data/shared:z
+      - ./data/outputs:/opt/bigdata/data/outputs:z
+    networks:
+      bigdata-lab-net:
+        aliases:
+          - master
+    ports:
+      - "9000:9000"
+      - "9870:9870"
+      - "8088:8088"
+      - "19888:19888"
+    healthcheck:
+      test: ["CMD-SHELL", "jps | grep -Eq 'NameNode|ResourceManager|JobHistoryServer'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    mem_limit: 4g
+    cpus: 1.5
+
+  worker1:
+    container_name: bigdata-worker1
+    hostname: worker1
+    build:
+      context: .
+      dockerfile: containers/worker/Containerfile
+      args:
+        BASE_IMAGE: "bigdata-core-base:${BIGDATA_IMAGE_TAG}"
+    image: bigdata-worker-core:${BIGDATA_IMAGE_TAG}
+    depends_on:
+      master:
+        condition: service_started
+    environment:
+      SERVICE_ROLE: worker
+      WORKER_NAME: worker1
+      TZ: America/Santiago
+    volumes:
+      - ./conf:/opt/bigdata/conf:ro,z
+      - datanode1-data:/opt/bigdata/data/datanode
+    networks:
+      bigdata-lab-net:
+        aliases:
+          - worker1
+    ports:
+      - "9864:9864"
+      - "8042:8042"
+    healthcheck:
+      test: ["CMD-SHELL", "jps | grep -Eq 'DataNode|NodeManager'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    mem_limit: 5g
+    cpus: 2.0
+
+  worker2:
+    container_name: bigdata-worker2
+    hostname: worker2
+    image: bigdata-worker-core:${BIGDATA_IMAGE_TAG}
+    depends_on:
+      master:
+        condition: service_started
+    environment:
+      SERVICE_ROLE: worker
+      WORKER_NAME: worker2
+      TZ: America/Santiago
+    volumes:
+      - ./conf:/opt/bigdata/conf:ro,z
+      - datanode2-data:/opt/bigdata/data/datanode
+    networks:
+      bigdata-lab-net:
+        aliases:
+          - worker2
+    ports:
+      - "9865:9864"
+      - "8043:8042"
+    healthcheck:
+      test: ["CMD-SHELL", "jps | grep -Eq 'DataNode|NodeManager'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    mem_limit: 5g
+    cpus: 2.0
+
+  worker3:
+    container_name: bigdata-worker3
+    hostname: worker3
+    image: bigdata-worker-core:${BIGDATA_IMAGE_TAG}
+    depends_on:
+      master:
+        condition: service_started
+    environment:
+      SERVICE_ROLE: worker
+      WORKER_NAME: worker3
+      TZ: America/Santiago
+    volumes:
+      - ./conf:/opt/bigdata/conf:ro,z
+      - datanode3-data:/opt/bigdata/data/datanode
+    networks:
+      bigdata-lab-net:
+        aliases:
+          - worker3
+    ports:
+      - "9866:9864"
+      - "8044:8042"
+    healthcheck:
+      test: ["CMD-SHELL", "jps | grep -Eq 'DataNode|NodeManager'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    mem_limit: 5g
+    cpus: 2.0
+
+networks:
+  bigdata-lab-net:
+    name: bigdata-lab-net
+    driver: bridge
+
+volumes:
+  namenode-data:
+  datanode1-data:
+  datanode2-data:
+  datanode3-data:

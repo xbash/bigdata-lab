@@ -1,0 +1,24 @@
+services:
+  elasticsearch:
+    container_name: bigdata-elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.10
+    environment:
+      ES_JAVA_OPTS: "-Xms768m -Xmx768m"
+      xpack.security.enabled: "false"
+      TZ: America/Santiago
+    volumes:
+      - ./conf/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      bigdata-lab-net:
+        aliases:
+          - cm
+          - elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    mem_limit: 1536m
+    cpus: 1.0
+
+volumes:
+  elasticsearch-data:

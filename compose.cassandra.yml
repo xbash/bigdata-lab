@@ -1,0 +1,76 @@
+services:
+  master:
+    build:
+      context: .
+      dockerfile: containers/master/Containerfile
+      args:
+        BASE_IMAGE: "bigdata-cassandra-base:${BIGDATA_IMAGE_TAG}"
+    image: bigdata-master-cassandra:${BIGDATA_IMAGE_TAG}
+    environment:
+      ENABLE_CASSANDRA: "true"
+      CASSANDRA_NODE_NAME: master
+      CASSANDRA_LISTEN_ADDRESS: master
+      CASSANDRA_RPC_ADDRESS: 0.0.0.0
+      CASSANDRA_SEEDS: master
+      CASSANDRA_CLUSTER_NAME: "Cassandra Cluster"
+      CASSANDRA_MAX_HEAP_SIZE: 512M
+      CASSANDRA_HEAP_NEWSIZE: 128M
+    volumes:
+      - cassandra-master-data:/opt/bigdata/data/cassandra
+    ports:
+      - "9042:9042"
+      - "9160:9160"
+      - "7199:7199"
+
+  worker1:
+    build:
+      context: .
+      dockerfile: containers/worker/Containerfile
+      args:
+        BASE_IMAGE: "bigdata-cassandra-base:${BIGDATA_IMAGE_TAG}"
+    image: bigdata-worker-cassandra:${BIGDATA_IMAGE_TAG}
+    environment:
+      ENABLE_CASSANDRA: "true"
+      CASSANDRA_NODE_NAME: worker1
+      CASSANDRA_LISTEN_ADDRESS: worker1
+      CASSANDRA_RPC_ADDRESS: 0.0.0.0
+      CASSANDRA_SEEDS: master
+      CASSANDRA_CLUSTER_NAME: "Cassandra Cluster"
+      CASSANDRA_MAX_HEAP_SIZE: 512M
+      CASSANDRA_HEAP_NEWSIZE: 128M
+    volumes:
+      - cassandra-worker1-data:/opt/bigdata/data/cassandra
+
+  worker2:
+    image: bigdata-worker-cassandra:${BIGDATA_IMAGE_TAG}
+    environment:
+      ENABLE_CASSANDRA: "true"
+      CASSANDRA_NODE_NAME: worker2
+      CASSANDRA_LISTEN_ADDRESS: worker2
+      CASSANDRA_RPC_ADDRESS: 0.0.0.0
+      CASSANDRA_SEEDS: master
+      CASSANDRA_CLUSTER_NAME: "Cassandra Cluster"
+      CASSANDRA_MAX_HEAP_SIZE: 512M
+      CASSANDRA_HEAP_NEWSIZE: 128M
+    volumes:
+      - cassandra-worker2-data:/opt/bigdata/data/cassandra
+
+  worker3:
+    image: bigdata-worker-cassandra:${BIGDATA_IMAGE_TAG}
+    environment:
+      ENABLE_CASSANDRA: "true"
+      CASSANDRA_NODE_NAME: worker3
+      CASSANDRA_LISTEN_ADDRESS: worker3
+      CASSANDRA_RPC_ADDRESS: 0.0.0.0
+      CASSANDRA_SEEDS: master
+      CASSANDRA_CLUSTER_NAME: "Cassandra Cluster"
+      CASSANDRA_MAX_HEAP_SIZE: 512M
+      CASSANDRA_HEAP_NEWSIZE: 128M
+    volumes:
+      - cassandra-worker3-data:/opt/bigdata/data/cassandra
+
+volumes:
+  cassandra-master-data:
+  cassandra-worker1-data:
+  cassandra-worker2-data:
+  cassandra-worker3-data:

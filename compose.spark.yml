@@ -1,0 +1,42 @@
+services:
+  master:
+    build:
+      context: .
+      dockerfile: containers/master/Containerfile
+      args:
+        BASE_IMAGE: "bigdata-spark-base:${BIGDATA_IMAGE_TAG}"
+    image: bigdata-master-spark:${BIGDATA_IMAGE_TAG}
+    environment:
+      ENABLE_SPARK: "true"
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+
+  worker1:
+    build:
+      context: .
+      dockerfile: containers/worker/Containerfile
+      args:
+        BASE_IMAGE: "bigdata-spark-base:${BIGDATA_IMAGE_TAG}"
+    image: bigdata-worker-spark:${BIGDATA_IMAGE_TAG}
+    environment:
+      ENABLE_SPARK: "true"
+      SPARK_WORKER_WEBUI_PORT: "8081"
+    ports:
+      - "8081:8081"
+
+  worker2:
+    image: bigdata-worker-spark:${BIGDATA_IMAGE_TAG}
+    environment:
+      ENABLE_SPARK: "true"
+      SPARK_WORKER_WEBUI_PORT: "8081"
+    ports:
+      - "8082:8081"
+
+  worker3:
+    image: bigdata-worker-spark:${BIGDATA_IMAGE_TAG}
+    environment:
+      ENABLE_SPARK: "true"
+      SPARK_WORKER_WEBUI_PORT: "8081"
+    ports:
+      - "8083:8081"
