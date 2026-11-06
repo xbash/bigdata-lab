@@ -1,0 +1,65 @@
+ARG HADOOP_VERSION=2.10.0
+ARG PIG_VERSION=0.18.0-SNAPSHOT
+ARG PIG_ARCHIVE_DIRNAME=
+ARG PIG_ARCHIVE_SHA256=
+
+FROM eclipse-temurin:11.0.26_4-jdk-jammy
+
+ARG HADOOP_VERSION
+ARG PIG_VERSION
+ARG PIG_ARCHIVE_DIRNAME
+ARG PIG_ARCHIVE_SHA256
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV BIGDATA_HOME=/opt/bigdata
+ENV HADOOP_HOME=/opt/bigdata/hadoop
+ENV PIG_HOME=/opt/bigdata/pig
+ENV HADOOP_CONF_DIR=/opt/bigdata/conf/hadoop
+ENV PIG_CONF_DIR=/opt/bigdata/conf/pig
+ENV HADOOP_LOG_DIR=/opt/bigdata/logs/hadoop
+ENV HADOOP_PID_DIR=/opt/bigdata/logs/hadoop/pids
+ENV YARN_LOG_DIR=/opt/bigdata/logs/yarn
+ENV PATH=/opt/bigdata/hadoop/bin:/opt/bigdata/hadoop/sbin:/opt/bigdata/pig/bin:${PATH}
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    ca-certificates \
+    curl \
+    netcat-openbsd \
+    procps \
+    python2 \
+    python3 \
+    rsync \
+    tini \
+    tzdata \
+    xmlstarlet \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd -g 1000 bigdata && useradd -m -u 1000 -g 1000 -s /bin/bash bigdata
+
+RUN mkdir -p /opt/bigdata /opt/bigdata/src \
+    /opt/bigdata/conf/hadoop /opt/bigdata/conf/spark /opt/bigdata/conf/pig /opt/bigdata/conf/hive \
+    /opt/bigdata/data/namenode /opt/bigdata/data/datanode /opt/bigdata/data/shared /opt/bigdata/data/outputs /opt/bigdata/data/hive \
+    /opt/bigdata/logs/hadoop/pids /opt/bigdata/logs/yarn
+
+COPY .artifacts/pig-0.18.0-SNAPSHOT-course.tgz /tmp/pig-0.18.0-SNAPSHOT-course.tgz
+
+RUN set -eux; \
+    curl -fsSL "https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz" \
+      | tar -xz -C /opt/bigdata/src; \
+    mv "/opt/bigdata/src/hadoop-${HADOOP_VERSION}" /opt/bigdata/hadoop; \
+    actual_sha256="$(sha256sum /tmp/pig-0.18.0-SNAPSHOT-course.tgz | awk '{print toupper($1)}')"; \
+    test -n "${PIG_ARCHIVE_SHA256}"; \
+    test "${actual_sha256}" = "${PIG_ARCHIVE_SHA256}"; \
+    tar -xzf /tmp/pig-0.18.0-SNAPSHOT-course.tgz -C /opt/bigdata/src; \
+    pig_dir="${PIG_ARCHIVE_DIRNAME:-pig-${PIG_VERSION}}"; \
+    mv "/opt/bigdata/src/${pig_dir}" /opt/bigdata/pig; \
+    rm -f /tmp/pig-0.18.0-SNAPSHOT-course.tgz
+
+RUN chown -R bigdata:bigdata /opt/bigdata
+
+USER bigdata
+WORKDIR /opt/bigdata
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["/bin/bash"]

@@ -1,0 +1,21 @@
+ARG BASE_IMAGE
+ARG SPARK_VERSION=3.3.2
+
+FROM ${BASE_IMAGE}
+
+ARG SPARK_VERSION
+
+USER root
+
+ENV SPARK_HOME=/opt/bigdata/spark
+ENV SPARK_CONF_DIR=/opt/bigdata/conf/spark
+ENV SPARK_LOG_DIR=/opt/bigdata/logs/spark
+ENV PATH=/opt/bigdata/spark/bin:/opt/bigdata/spark/sbin:${PATH}
+
+RUN mkdir -p /opt/bigdata/src /opt/bigdata/logs/spark && \
+    curl -fsSL "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz" \
+      | tar -xz -C /opt/bigdata/src && \
+    mv "/opt/bigdata/src/spark-${SPARK_VERSION}-bin-hadoop3" /opt/bigdata/spark && \
+    chown -R bigdata:bigdata /opt/bigdata
+
+USER bigdata

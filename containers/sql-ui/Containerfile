@@ -1,0 +1,10 @@
+ARG HUE_UPSTREAM_IMAGE=gethue/hue:latest
+FROM ${HUE_UPSTREAM_IMAGE}
+
+USER root
+
+RUN mkdir -p /opt/bigdata/conf/hue /opt/bigdata/data/hue /usr/share/hue/desktop/conf \
+    && touch /opt/bigdata/conf/hue/hue.ini \
+    && ln -sf /opt/bigdata/conf/hue/hue.ini /usr/share/hue/desktop/conf/z-hue.ini
+
+EXPOSE 8888

@@ -1,0 +1,130 @@
+# ==============================================================================
+# bigdata-lab - .gitignore
+# ==============================================================================
+# Objetivo:
+# - Excluir archivos locales, temporales y de desarrollo.
+# - Excluir logs, notas y resultados generados por cada laboratorio.
+# - Excluir documentación interna y evidencias.
+# - Mantener versionados datasets y artefactos necesarios para reproducibilidad.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Sistema operativo
+# ------------------------------------------------------------------------------
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+
+# ------------------------------------------------------------------------------
+# IDE y editores
+# ------------------------------------------------------------------------------
+
+.vscode/
+.idea/
+
+*.swp
+*.swo
+*~
+.project
+.classpath
+.pydevproject
+
+
+# ------------------------------------------------------------------------------
+# Variables de entorno y configuración local sensible
+# ------------------------------------------------------------------------------
+
+# Secretos
+*.pem
+*.key
+*.p12
+*.pfx
+*.kdb
+*.jks
+id_rsa
+id_ed25519
+
+# Configuración sensible
+.env.local
+.env.secret
+.env
+.env.*
+!.env.example
+
+# ------------------------------------------------------------------------------
+# Python
+# ------------------------------------------------------------------------------
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+.venv/
+venv/
+env/
+
+
+# ------------------------------------------------------------------------------
+# Archivos temporales y caché
+# ------------------------------------------------------------------------------
+
+tmp/
+temp/
+.cache/
+scratch/
+
+# Repositorios Git de respaldo
+.git.backup/
+.git.old/
+.git*
+!.gitignore
+!.gitattributes
+
+*.tmp
+*.temp
+*.bak
+*.old
+
+
+# ------------------------------------------------------------------------------
+# Logs generales
+# ------------------------------------------------------------------------------
+
+*.log
+
+
+# ------------------------------------------------------------------------------
+# Archivos generados por los laboratorios
+# ------------------------------------------------------------------------------
+
+# No versionar logs generados dentro de ningún laboratorio
+/data/shared/*/logs/
+
+# No versionar notas locales/internas de los laboratorios
+/data/shared/*/notes/
+
+# No versionar resultados generados por los laboratorios
+/data/shared/*/results/
+
+
+# ------------------------------------------------------------------------------
+# Documentación interna y evidencia
+# ------------------------------------------------------------------------------
+
+# Documentación privada (no publicar)
+/docs/private/
+
+# No publicar evidencias locales
+/evidencia/

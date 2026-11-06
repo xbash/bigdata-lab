@@ -1,0 +1,8 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+COPY --chown=bigdata:bigdata containers/master/entrypoint.sh /opt/bigdata/bin/entrypoint.sh
+
+RUN chmod +x /opt/bigdata/bin/entrypoint.sh
+
+CMD ["/opt/bigdata/bin/entrypoint.sh"]

@@ -1,0 +1,28 @@
+services:
+  mongodb:
+    container_name: bigdata-mongodb
+    hostname: mongodb
+    image: docker.io/library/mongo:4.4.14
+    environment:
+      TZ: America/Santiago
+    command: ["mongod", "--bind_ip_all"]
+    volumes:
+      - mongodb-data:/data/db
+      - ./data/shared/lab08:/opt/bigdata/data/shared/lab08:z
+    networks:
+      bigdata-lab-net:
+        aliases:
+          - mongodb
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD-SHELL", "mongo --quiet --eval \"db.adminCommand({ ping: 1 }).ok\" | grep -q 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    mem_limit: 1g
+    cpus: 1.0
+
+volumes:
+  mongodb-data:

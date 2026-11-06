@@ -1,0 +1,23 @@
+ARG BASE_IMAGE
+ARG CASSANDRA_VERSION=2.0.7
+
+FROM ${BASE_IMAGE}
+
+ARG CASSANDRA_VERSION
+
+USER root
+
+ENV CASSANDRA_HOME=/opt/bigdata/cassandra
+ENV CASSANDRA_LOG_DIR=/opt/bigdata/logs/cassandra
+ENV PATH=/opt/bigdata/cassandra/bin:${PATH}
+
+COPY --chown=bigdata:bigdata containers/scripts/bash/start-cassandra.sh /opt/bigdata/bin/start-cassandra.sh
+
+RUN mkdir -p /opt/bigdata/src /opt/bigdata/data/cassandra /opt/bigdata/logs/cassandra && \
+    curl -fsSL "https://archive.apache.org/dist/cassandra/${CASSANDRA_VERSION}/apache-cassandra-${CASSANDRA_VERSION}-bin.tar.gz" \
+      | tar -xz -C /opt/bigdata/src && \
+    mv "/opt/bigdata/src/apache-cassandra-${CASSANDRA_VERSION}" /opt/bigdata/cassandra && \
+    chmod +x /opt/bigdata/bin/start-cassandra.sh && \
+    chown -R bigdata:bigdata /opt/bigdata
+
+USER bigdata
